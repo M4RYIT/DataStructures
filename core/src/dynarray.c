@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "dynarray.h"
+#include "ds_utils.h"
 
 float size_perc(const dynarray *array)
 {
@@ -9,15 +10,27 @@ float size_perc(const dynarray *array)
 
 int dynarray_init(dynarray *array, const size_t size_of_element)
 {
+    if (!array)
+    {
+        puts("Null array");
+        return -1;
+    }
+
     array->number_of_elements = 0;
     array->size_of_element = size_of_element;
     array->capacity = start_capacity;
     array->data = malloc(array->capacity*size_of_element);
-    array->tmp = malloc(size_of_element);
-
-    if (!array->tmp || !array->data)
+    if (!array->data)
     {
-        puts("Allocation failed");
+        puts("Data allocation failure");
+        return -1;
+    }
+
+    array->tmp = malloc(size_of_element);
+    if (!array->tmp)
+    {
+        free(array->data);
+        puts("Temp data allocation failed");
         return -1;
     }
 
@@ -45,7 +58,7 @@ int dynarray_append(dynarray *array, const void *value)
 
         if (!new_data)
         {
-            puts("Append failed");
+            puts("Append failure");
             return -1;
         }
 
@@ -108,7 +121,7 @@ int dynarray_remove(dynarray *array, const size_t index)
                 memcpy(array->data + offset, array->tmp, array->size_of_element);
             }
 
-            puts("Remove failed");
+            puts("Remove failure");
             return -1;
         }
 
